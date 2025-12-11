@@ -1,5 +1,5 @@
 """Discord Bot Posiedon Main Function"""
-
+from maps import raidMaps
 import discord
 from discord.ext import commands
 from discord import app_commands as app
@@ -89,7 +89,42 @@ if len > 1 then
 """
 
 
+@bot.tree.command(name="maps", description="Show 3 randomly selected maps based on size category and such.")
+async def games(interaction: discord.Interaction):
+    # 1. Define your data (This mimics the data in your screenshot)
+    # You would normally fetch this from your text file or database/API
+    match_data = [
+        {"title": "Map 1", "map": "Site Kronos", "size": "8v8", "color": discord.Color.green(), "image": "C:/Users/willl/Desktop/uni/uni coding hehe/Discord Bot/mapScreenShots/siteKronos.png"},
+        {"title": "Map 2", "map": "Solitude", "size": "Slayer", "color": discord.Color.green(), "image": ""},
+        {"title": "Map 3", "map": "Recharge", "size": "Strongholds", "color": discord.Color.green(), "image": ""}]
+    # 2. Create a list to hold the embeds
+    # Discord allows up to 10 embeds in a single message
+    embed_list = []
 
+    for match in match_data:
+        # Create the embed object
+        embed = discord.Embed(
+            title=match["title"],
+            color=match["color"] # This sets the sidebar color
+        )
+
+        # Add the "Map" field
+        embed.add_field(name="Map", value=match["map"], inline=True)
+        
+        # Add the "Mode" field
+        # inline=True makes them sit next to each other
+        embed.add_field(name="Size", value=match["size"], inline=True)
+
+        # Set the image on the right side
+        # NOTE: You must use a valid URL (http/https) for images
+        embed.set_thumbnail(url=match["image"])
+
+        # Add to our list
+        embed_list.append(embed)
+
+    # 3. Send the list of embeds
+    # Note the parameter is 'embeds=' (plural) and takes a list
+    await interaction.response.send_message(embeds=embed_list)
 
 
 
