@@ -1,5 +1,6 @@
 """Discord Bot Posiedon Main Function"""
 from maps import raidMaps
+from maps import Maps
 import discord
 from discord.ext import commands
 from discord import app_commands as app
@@ -69,6 +70,14 @@ async def average(interaction: discord.Interaction, num1: int, num2: int, num3: 
 @bot.tree.command(name="servers", description="Aims to show which servers the user is in.")
 @app.commands.describe(user="Mention user with @ to find servers")
 async def servers(interaction: discord.Interaction, user: discord.Member = None):
+    """
+    TODO 
+    if len > 1 then 
+        display server with roles in it and nick
+
+        
+
+    """
     target_user = user or interaction.user
     shared_guilds = target_user.mutual_guilds
     if shared_guilds:
@@ -78,52 +87,72 @@ async def servers(interaction: discord.Interaction, user: discord.Member = None)
         await interaction.response.send_message(f"Posiedon does not share any guilds with {target_user.mention}")
 
 
-
-"""
-TODO
-Write a function that checks mutual servers with the bot, 
-if len > 1 then 
-    display server with roles in it and nick
-
-
-"""
-
 # MADE GEMINI CREATE A COMMAND TO CLEAR UP CONFUSION FROM THE DOCUMENTATION TO UNDERSTAND HOW TO MAKE EMBEDS IN DISCORD
 #CONSIDER MAKING A DICTIONARYU THAT PULLS A NAME ON A RANDOM NUMBER THEN REFERENCES THAT NAME IN A SEPERATE DICTIONARY WHICH POINTS TO A LIST OF DATA AND THEN USE "info[elemnt]" to pull specific data ;ike screenshot or attacking weapon details etc. 
-@bot.tree.command(name="maps", description="Show 3 randomly selected maps based on size category and such.")
+@bot.tree.command(name="maps", description="Exampel Display")
 async def games(interaction: discord.Interaction):
-    # 1. Define your data (This mimics the data in your screenshot)
-    # You would normally fetch this from your text file or database/API
-    match_data = [
-        {"title": "Map 1", "map": "Site Kronos", "size": "8v8", "color": discord.Color.green(), "image": "https://raw.githubusercontent.com/Willleeson/Discord-Bot/429d41843b31ff18d16eb8ab58a53b4e7dfa5fe0/mapScreenShots/siteKronos.png"},
-        {"title": "Map 2", "map": "Solitude", "size": "Slayer", "color": discord.Color.green(), "image": ""},
-        {"title": "Map 3", "map": "Recharge", "size": "Strongholds", "color": discord.Color.green(), "image": ""}]
+    data = Maps(8, "Raid")
+    usedMap = data.getMapDetail("Site Kronos")
+    mapData = [
+        {"title": "Map 1",
+         "image": usedMap[0],
+         "map": "Site Kronos",
+         "size": "8v8",
+         "color": discord.Color.green(),
+         "Attacking Weapons": usedMap[1],
+         "Attacking Equipment": usedMap[2],
+         "Defending Weapons": usedMap[3],
+         "Defending Equipment": usedMap[4],
+         "Vehicles": usedMap[5]},
+
+        {"title": "Map 2",
+         "image": usedMap[0],
+         "map": "Site Kronos",
+         "size": "8v8",
+         "color": discord.Color.green(),
+         "Attacking Weapons": usedMap[1],
+         "Attacking Equipment": usedMap[2],
+         "Defending Weapons": usedMap[3],
+         "Defending Equipment": usedMap[4],
+         "Vehicles": usedMap[5]},
+         
+        {"title": "Map 3",
+         "image": usedMap[0],
+         "map": "Site Kronos",
+         "size": "8v8",
+         "color": discord.Color.green(),
+         "Attacking Weapons": usedMap[1],
+         "Attacking Equipment": usedMap[2],
+         "Defending Weapons": usedMap[3],
+         "Defending Equipment": usedMap[4],
+         "Vehicles": usedMap[5]},]
     # 2. Create a list to hold the embeds
     # Discord allows up to 10 embeds in a single message
     embed_list = []
 
-    for match in match_data:
+    for map in mapData:
         # Create the embed object
         embed = discord.Embed(
-            title=match["title"],
-            color=match["color"] # This sets the sidebar color
+            title=map["title"],
+            color=map["color"] # This sets the sidebar color
         )
 
         # Add the "Map" field
-        embed.add_field(name="Map", value=match["map"], inline=True)
+        embed.add_field(name="Map", value=map["map"], inline=True)
         
         # Add the "Mode" field
         # inline=True makes them sit next to each other
-        embed.add_field(name="Size", value=match["size"], inline=True)
+        embed.add_field(name="Size", value=map["size"], inline=True)
+        embed.add_field(name="Attacking Weapons", value=map["Attacking Weapons"], inline=True)
+        embed.add_field(name="Attacking Equipment", value=map["Attacking Equipment"], inline=True)
+        embed.add_field(name="Defending Weapons", value=map["Defending Weapons"], inline=True)
+        embed.add_field(name="Defending Equipment", value=map["Defending Equipment"], inline=True)
+        embed.add_field(name="Vehicles", value=map["Vehicles"], inline=True)
 
-        # Set the image on the right side
-        # NOTE: You must use a valid URL (http/https) for images
-        embed.set_thumbnail(url=match["image"])
+        embed.set_thumbnail(url=mapData["image"])
 
-        # Add to our list
         embed_list.append(embed)
 
-    # 3. Send the list of embeds
     # Note the parameter is 'embeds=' (plural) and takes a list
     await interaction.response.send_message(embeds=embed_list)
 
