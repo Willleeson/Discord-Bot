@@ -88,13 +88,14 @@ if len > 1 then
 
 """
 
-
+# MADE GEMINI CREATE A COMMAND TO CLEAR UP CONFUSION FROM THE DOCUMENTATION TO UNDERSTAND HOW TO MAKE EMBEDS IN DISCORD
+#CONSIDER MAKING A DICTIONARYU THAT PULLS A NAME ON A RANDOM NUMBER THEN REFERENCES THAT NAME IN A SEPERATE DICTIONARY WHICH POINTS TO A LIST OF DATA AND THEN USE "info[elemnt]" to pull specific data ;ike screenshot or attacking weapon details etc. 
 @bot.tree.command(name="maps", description="Show 3 randomly selected maps based on size category and such.")
 async def games(interaction: discord.Interaction):
     # 1. Define your data (This mimics the data in your screenshot)
     # You would normally fetch this from your text file or database/API
     match_data = [
-        {"title": "Map 1", "map": "Site Kronos", "size": "8v8", "color": discord.Color.green(), "image": "C:/Users/willl/Desktop/uni/uni coding hehe/Discord Bot/mapScreenShots/siteKronos.png"},
+        {"title": "Map 1", "map": "Site Kronos", "size": "8v8", "color": discord.Color.green(), "image": "https://raw.githubusercontent.com/Willleeson/Discord-Bot/429d41843b31ff18d16eb8ab58a53b4e7dfa5fe0/mapScreenShots/siteKronos.png"},
         {"title": "Map 2", "map": "Solitude", "size": "Slayer", "color": discord.Color.green(), "image": ""},
         {"title": "Map 3", "map": "Recharge", "size": "Strongholds", "color": discord.Color.green(), "image": ""}]
     # 2. Create a list to hold the embeds
@@ -128,5 +129,4 @@ async def games(interaction: discord.Interaction):
 
 
 
-# We have to run
 bot.run("")
