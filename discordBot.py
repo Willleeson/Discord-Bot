@@ -37,34 +37,7 @@ class MyBot(commands.Bot):
         except Exception as e:
             print(f"ERROR: {e}")
 
-
-
-    async def on_message(self, message):
-        # This line is crucial! It allows !commands to work alongside on_message
-        await self.process_commands(message) 
-        print(f'Message from {message.author}: {message.content} ({message.channel}, {message.channel.category}, {message.channel.mention})')
-
 bot = MyBot()
-
-
-@bot.tree.command(name="repeat",description="Repeats what you feed it.")
-@app.commands.describe(repeat_message="Message to repeat")
-async def repeat(interaction: discord.Interaction, repeat_message: str):
-    await interaction.response.send_message(repeat_message)
-
-
-@bot.tree.command(name="average",description="Gives you the average of a certain number of inputs where input is an integer")
-@app.commands.describe(num1="First Number",
-                       num2="Second Number",
-                       num3="Third Number",
-                       num4="Fourth Number"
-)
-async def average(interaction: discord.Interaction, num1: int, num2: int, num3: int, num4: int):
-    print(type(num1))
-    sum = int(num1) + int(num2) + int(num3) + int(num4)
-    avg = sum / 4
-    await interaction.response.send_message(avg)
-
 
 @bot.tree.command(name="servers", description="Aims to show which servers the user is in.")
 @app.commands.describe(user="Mention user with @ to find servers")
@@ -130,6 +103,17 @@ async def raid(interaction: discord.Interaction, size: app.commands.Choice[int])
 
 
     await interaction.response.send_message(embeds=embedList)
+
+@bot.tree.command(name="purge", description="Purge the last x messages from current channel")
+@app.commands.describe(amount="Amount of messages to delete")
+async def purge(interaction: discord.Interaction, amount: int):
+        await interaction.response.send_message(f"Deleting {amount} messages", ephemeral=True)
+        await interaction.channel.purge(limit=amount)
+
+@purge.error
+async def clear_error(interaction: discord.Interaction, error):
+    if isinstance(error, app.commands.MissingPermissions):
+        await interaction.response.send_message("You do not have permission to delete messages.", ephemeral=True)
 
 def getToken():
     try:
