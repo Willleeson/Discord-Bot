@@ -1,6 +1,5 @@
 """Discord Bot Posiedon Main Function"""
 from maps import raidMaps
-from maps import Maps
 import discord
 from discord.ext import commands
 from discord import app_commands as app
@@ -74,9 +73,6 @@ async def servers(interaction: discord.Interaction, user: discord.Member = None)
     TODO 
     if len > 1 then 
         display server with roles in it and nick
-
-        
-
     """
     target_user = user or interaction.user
     shared_guilds = target_user.mutual_guilds
@@ -87,75 +83,62 @@ async def servers(interaction: discord.Interaction, user: discord.Member = None)
         await interaction.response.send_message(f"Posiedon does not share any guilds with {target_user.mention}")
 
 
-# MADE GEMINI CREATE A COMMAND TO CLEAR UP CONFUSION FROM THE DOCUMENTATION TO UNDERSTAND HOW TO MAKE EMBEDS IN DISCORD
-#CONSIDER MAKING A DICTIONARYU THAT PULLS A NAME ON A RANDOM NUMBER THEN REFERENCES THAT NAME IN A SEPERATE DICTIONARY WHICH POINTS TO A LIST OF DATA AND THEN USE "info[elemnt]" to pull specific data ;ike screenshot or attacking weapon details etc. 
-@bot.tree.command(name="maps", description="Exampel Display")
-async def games(interaction: discord.Interaction):
-    data = Maps(8, "Raid")
-    usedMap = data.getMapDetail("Site Kronos")
-    mapData = [
-        {"title": "Map 1",
-         "image": usedMap[0],
-         "map": "Site Kronos",
-         "size": "8v8",
-         "color": discord.Color.green(),
-         "Attacking Weapons": usedMap[1],
-         "Attacking Equipment": usedMap[2],
-         "Defending Weapons": usedMap[3],
-         "Defending Equipment": usedMap[4],
-         "Vehicles": usedMap[5]},
 
-        {"title": "Map 2",
-         "image": usedMap[0],
-         "map": "Site Kronos",
-         "size": "8v8",
-         "color": discord.Color.green(),
-         "Attacking Weapons": usedMap[1],
-         "Attacking Equipment": usedMap[2],
-         "Defending Weapons": usedMap[3],
-         "Defending Equipment": usedMap[4],
-         "Vehicles": usedMap[5]},
-         
-        {"title": "Map 3",
-         "image": usedMap[0],
-         "map": "Site Kronos",
-         "size": "8v8",
-         "color": discord.Color.green(),
-         "Attacking Weapons": usedMap[1],
-         "Attacking Equipment": usedMap[2],
-         "Defending Weapons": usedMap[3],
-         "Defending Equipment": usedMap[4],
-         "Vehicles": usedMap[5]},]
-    # 2. Create a list to hold the embeds
-    # Discord allows up to 10 embeds in a single message
-    embed_list = []
+@bot.tree.command(name="raid", description="Random Selection of 3 Raid Maps")
+@app.commands.describe(size="Size of Raid, 8 for 8v8. 10 for 10v10. 12 for 12v12")
+@app.commands.choices(size=[
+    app.commands.Choice(name="8v8", value=8),
+    app.commands.Choice(name="10v10", value=10),
+    app.commands.Choice(name="12v12", value=12)])
+async def raid(interaction: discord.Interaction, size: app.commands.Choice[int]):
+    selected_size = size.value
+    raid = raidMaps(selected_size, "raid")
+    nMaps = raid.getMapCount(selected_size)
+    embedList = []
+    rNumber = random.sample(range(1, nMaps + 1), min(3, nMaps))
 
-    for map in mapData:
-        # Create the embed object
+    for index, mapIndex in enumerate(rNumber, 1):
+        mapName = raid.getMap(mapIndex, selected_size)
+        mapDetails = raid.getMapDetail(mapName)
+        if mapDetails is None:
+            errorEmbed = discord.Embed(
+                title=f"Map {index}",
+                description=f"Details not found. Please check code for name. {mapName}",
+                color=discord.Color.red())
+            embedList.append(errorEmbed)
+            continue
         embed = discord.Embed(
-            title=map["title"],
-            color=map["color"] # This sets the sidebar color
-        )
+            title=f"Map {index}",
+            color=discord.Color.blue())
 
-        # Add the "Map" field
-        embed.add_field(name="Map", value=map["map"], inline=True)
-        
-        # Add the "Mode" field
-        # inline=True makes them sit next to each other
-        embed.add_field(name="Size", value=map["size"], inline=True)
-        embed.add_field(name="Attacking Weapons", value=map["Attacking Weapons"], inline=True)
-        embed.add_field(name="Attacking Equipment", value=map["Attacking Equipment"], inline=True)
-        embed.add_field(name="Defending Weapons", value=map["Defending Weapons"], inline=True)
-        embed.add_field(name="Defending Equipment", value=map["Defending Equipment"], inline=True)
-        embed.add_field(name="Vehicles", value=map["Vehicles"], inline=True)
-
-        embed.set_thumbnail(url=mapData["image"])
-
-        embed_list.append(embed)
-
-    # Note the parameter is 'embeds=' (plural) and takes a list
-    await interaction.response.send_message(embeds=embed_list)
+        embed.add_field(name="Map", value=mapName, inline=False)
+        embed.add_field(name="Builders", value=mapDetails[6], inline=True)
+        embed.add_field(name="\u200b", value="\u200b", inline=False)
+        embed.add_field(name="Attacking Weapons", value=mapDetails[1], inline=True)
+        embed.add_field(name="Attacking Equipment", value=mapDetails[2], inline=True)
+        embed.add_field(name="\u200b", value="\u200b", inline=False)
+        embed.add_field(name="Defending Weapons", value=mapDetails[3], inline=True)
+        embed.add_field(name="Defending Equipment", value=mapDetails[4], inline=True)
+        embed.add_field(name="\u200b", value="\u200b", inline=False)
+        embed.add_field(name="Vehicles", value=mapDetails[5], inline=True)
 
 
+        image_url = mapDetails[0]
+        if image_url and image_url.startswith("http"):
+            embed.set_image(url=image_url)
+        embedList.append(embed)
 
-bot.run("")
+
+    await interaction.response.send_message(embeds=embedList)
+
+def getToken():
+    try:
+        with open("token.txt", "r") as file:
+            token = file.readline().strip()
+            return token
+    except FileNotFoundError:
+        print("token.txt was not found in folder.")
+        return None
+
+bot.run(getToken())
+
