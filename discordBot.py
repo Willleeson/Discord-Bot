@@ -63,6 +63,7 @@ async def raid(interaction: discord.Interaction, size: app.commands.Choice[int])
         >>> Embed_3: Caladrius Nest.....
 \
     """
+    await interaction.response.defer()
     selected_size = size.value
     raid = raidMaps(selected_size, "raid")
     nMaps = raid.getMapCount(selected_size)
@@ -100,7 +101,7 @@ async def raid(interaction: discord.Interaction, size: app.commands.Choice[int])
         embedList.append(embed)
 
 
-    await interaction.response.send_message(embeds=embedList)
+    await interaction.followup.send(embeds=embedList)
 
 @bot.tree.command(name="purge", description="Purge the last x messages from current channel")
 @app.commands.describe(amount="Amount of messages to delete")
