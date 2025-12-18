@@ -161,9 +161,9 @@ class raidMaps(Maps):
     def raidMapPool(self, size) -> dict[int, str]:
         if size == 8:
             return {
-                1: "Site Kronos", #DONE
+                1: "Site Kronos",
                 2: "Firebase Meridian",
-                3: "Caladrius Nest", #Need more
+                3: "Caladrius Nest",
                 4: "Outpost Illustria",
                 5: "FOB: Hope",
                 6: "Facility Nightfall",
@@ -172,9 +172,9 @@ class raidMaps(Maps):
                 9: "Griffins Nest"}
         elif size == 10:
             return {
-                1: "Firebase Theia", #Need more
+                1: "Firebase Theia",
                 2: "Firebase Meridian", 
-                3: "Caladrius Nest", #Need more
+                3: "Caladrius Nest",
                 4: "Fort Greenhorn", 
                 5: "Outpost Illustria", 
                 6: "FOB: Hope",
@@ -190,9 +190,9 @@ class raidMaps(Maps):
                 16: "Outpost Jupiter"}
         elif size == 12:
             return {
-                1: "Firebase Theia", #Need more
+                1: "Firebase Theia", 
                 2: "Firebase Meridian", 
-                3: "Caladrius Nest", #Need more
+                3: "Caladrius Nest", 
                 4: "Fort Greenhorn", 
                 5: "Griffins Nest", 
                 6: "Interpeak Outpost",

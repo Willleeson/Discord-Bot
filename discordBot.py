@@ -4,6 +4,7 @@ import discord
 from discord.ext import commands
 from discord import app_commands as app
 import random
+import os
 
 intents = discord.Intents.default()
 intents.message_content = True
@@ -39,23 +40,6 @@ class MyBot(commands.Bot):
 
 bot = MyBot()
 
-@bot.tree.command(name="servers", description="Aims to show which servers the user is in.")
-@app.commands.describe(user="Mention user with @ to find servers")
-async def servers(interaction: discord.Interaction, user: discord.Member = None):
-    """
-    TODO 
-    if len > 1 then 
-        display server with roles in it and nick
-    """
-    target_user = user or interaction.user
-    shared_guilds = target_user.mutual_guilds
-    if shared_guilds:
-        server_names = ",".join([guild.name for guild in shared_guilds])
-        await interaction.response.send_message(f"Shared guilds with user: {target_user.mention} \nServers:\n {server_names}")
-    else:
-        await interaction.response.send_message(f"Posiedon does not share any guilds with {target_user.mention}")
-
-
 
 @bot.tree.command(name="raid", description="Random Selection of 3 Raid Maps")
 @app.commands.describe(size="Size of Raid, 8 for 8v8. 10 for 10v10. 12 for 12v12")
@@ -64,12 +48,26 @@ async def servers(interaction: discord.Interaction, user: discord.Member = None)
     app.commands.Choice(name="10v10", value=10),
     app.commands.Choice(name="12v12", value=12)])
 async def raid(interaction: discord.Interaction, size: app.commands.Choice[int]):
+    """A discord APP Comand that displays a random pooling of 3 maps based on the size given.
+
+    Args :
+        size (int): choice of 8, 10, 12 respectively representing 8v8, 10v10, 12v12 in the maps folder
+    
+    Returns :
+        Embed (discord.Interaction): 3 Discord Embeds of each different map showcasing: Image, weapons/equipment for both attack and defense. As well as vehicles and builders.
+        
+    Example :
+        >>> /raid 8v8
+        >>> Embed_1: Site Kronos.....
+        >>> Embed_2: Firebase Meridian.....
+        >>> Embed_3: Caladrius Nest.....
+\
+    """
     selected_size = size.value
     raid = raidMaps(selected_size, "raid")
     nMaps = raid.getMapCount(selected_size)
     embedList = []
     rNumber = random.sample(range(1, nMaps + 1), min(3, nMaps))
-
     for index, mapIndex in enumerate(rNumber, 1):
         mapName = raid.getMap(mapIndex, selected_size)
         mapDetails = raid.getMapDetail(mapName)
@@ -116,13 +114,13 @@ async def clear_error(interaction: discord.Interaction, error):
         await interaction.response.send_message("You do not have permission to delete messages.", ephemeral=True)
 
 def getToken():
-    try:
-        with open("token.txt", "r") as file:
-            token = file.readline().strip()
-            return token
-    except FileNotFoundError:
-        print("token.txt was not found in folder.")
-        return None
+    token = os.environ.get("DISCORD_TOKEN")
+    if token is None:
+        print("ERROR: DISCORD_TOKEN environment variable not found")
+    return token
 
+
+
+        
 bot.run(getToken())
 
