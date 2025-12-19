@@ -1,7 +1,5 @@
 """Discord Bot Posiedon Main Function"""
 from maps import raidMaps
-from flask import Flask
-from threading import Thread
 import discord
 from discord.ext import commands
 from discord import app_commands as app
@@ -10,20 +8,7 @@ import os
 
 
 
-alive = Flask('')
 
-@alive.route('/')
-def home():
-    return "Bot is Online!" 
-
-def run_flask():
-    port = int(os.environ.get("WEBSITE_PORT", 8080))
-    alive.run(host='0.0.0.0', port=port)
-
-def keep_alive():
-    t = Thread(target=run_flask)
-    t.daemon = True # Ensures the thread dies when the main script stops
-    t.start()
 
 intents = discord.Intents.default()
 intents.message_content = True
@@ -147,6 +132,4 @@ def getToken():
         print("ERROR: DISCORD_TOKEN environment variable not found")
     return token
 
-if __name__ == "__main__":
-    keep_alive()
-    bot.run(getToken())
+bot.run(getToken())
