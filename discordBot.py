@@ -136,6 +136,11 @@ async def clear_error(interaction: discord.Interaction, error):
     if isinstance(error, app.commands.MissingPermissions):
         await interaction.response.send_message("You do not have permission to delete messages.", ephemeral=True)
 
+@bot.tree.command(name="ping", description="Test if the bot is alive")
+async def ping(interaction: discord.Interaction):
+    print("Ping command received!", flush=True)
+    await interaction.response.send_message("Pong!")
+
 def getToken():
     token = os.environ.get("DISCORD_TOKEN")
     if token is None:
