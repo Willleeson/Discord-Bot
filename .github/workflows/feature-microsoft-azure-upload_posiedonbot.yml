@@ -32,6 +32,7 @@ jobs:
             --name posiedon-bot-instance \
             --image posiedon.azurecr.io/discord-bot:${{ github.sha }} \
             --cpu 1 --memory 1 \
+            --os-type Linux \
             --restart-policy Always \
             --registry-login-server posiedon.azurecr.io \
             --registry-username ${{ secrets.REGISTRY_USERNAME }} \
