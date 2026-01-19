@@ -10,6 +10,8 @@ intents = discord.Intents.default()
 intents.message_content = True
 intents.members = True
 
+
+
 class MyBot(commands.Bot):
     def __init__(self):
         super().__init__(command_prefix="!", intents=intents)
@@ -63,44 +65,52 @@ async def raid(interaction: discord.Interaction, size: app.commands.Choice[int])
         >>> Embed_3: Caladrius Nest.....
 \
     """
-    selected_size = size.value
-    raid = raidMaps(selected_size, "raid")
-    nMaps = raid.getMapCount(selected_size)
-    embedList = []
-    rNumber = random.sample(range(1, nMaps + 1), min(3, nMaps))
-    for index, mapIndex in enumerate(rNumber, 1):
-        mapName = raid.getMap(mapIndex, selected_size)
-        mapDetails = raid.getMapDetail(mapName)
-        if mapDetails is None:
-            errorEmbed = discord.Embed(
-                title=f"Map {index}",
-                description=f"Details not found. Please check code for name. {mapName}",
-                color=discord.Color.red())
-            embedList.append(errorEmbed)
-            continue
-        embed = discord.Embed(
-            title=f"Map {index}",
-            color=discord.Color.blue())
+    await interaction.response.defer()
+    try:
+        selected_size = size.value
+        raid_instance = raidMaps(selected_size, "raid")
+        nMaps = raid_instance.getMapCount(selected_size)
+        embedList = []
+        
+        # Select 3 random maps
+        rNumber = random.sample(range(1, nMaps + 1), min(3, nMaps))
+        
+        for index, mapIndex in enumerate(rNumber, 1):
+            mapName = raid_instance.getMap(mapIndex, selected_size)
+            mapDetails = raid_instance.getMapDetail(mapName)
+            
+            if mapDetails is None:
+                errorEmbed = discord.Embed(
+                    title=f"Map {index}",
+                    description=f"Details not found for {mapName}.",
+                    color=discord.Color.red())
+                embedList.append(errorEmbed)
+                continue
+                
+            embed = discord.Embed(title=f"Map {index}", color=discord.Color.blue())
+            embed.add_field(name="Map", value=mapName, inline=False)
+            embed.add_field(name="Builders", value=mapDetails[6], inline=True)
+            embed.add_field(name="\u200b", value="\u200b", inline=False)
+            embed.add_field(name="Attacking Weapons", value=mapDetails[1], inline=True)
+            embed.add_field(name="Attacking Equipment", value=mapDetails[2], inline=True)
+            embed.add_field(name="\u200b", value="\u200b", inline=False)
+            embed.add_field(name="Defending Weapons", value=mapDetails[3], inline=True)
+            embed.add_field(name="Defending Equipment", value=mapDetails[4], inline=True)
+            embed.add_field(name="\u200b", value="\u200b", inline=False)
+            embed.add_field(name="Vehicles", value=mapDetails[5], inline=True)
 
-        embed.add_field(name="Map", value=mapName, inline=False)
-        embed.add_field(name="Builders", value=mapDetails[6], inline=True)
-        embed.add_field(name="\u200b", value="\u200b", inline=False)
-        embed.add_field(name="Attacking Weapons", value=mapDetails[1], inline=True)
-        embed.add_field(name="Attacking Equipment", value=mapDetails[2], inline=True)
-        embed.add_field(name="\u200b", value="\u200b", inline=False)
-        embed.add_field(name="Defending Weapons", value=mapDetails[3], inline=True)
-        embed.add_field(name="Defending Equipment", value=mapDetails[4], inline=True)
-        embed.add_field(name="\u200b", value="\u200b", inline=False)
-        embed.add_field(name="Vehicles", value=mapDetails[5], inline=True)
+            image_url = mapDetails[0]
+            if image_url and image_url.startswith("http"):
+                embed.set_image(url=image_url)
+            embedList.append(embed)
 
+        # 2. SEND THE FINAL EMBEDS
+        # Since we used defer(), we must use interaction.followup.send instead.
+        await interaction.followup.send(embeds=embedList)
 
-        image_url = mapDetails[0]
-        if image_url and image_url.startswith("http"):
-            embed.set_image(url=image_url)
-        embedList.append(embed)
-
-
-    await interaction.response.send_message(embeds=embedList)
+    except Exception as e:
+        # If any error occurs during processing, report it to the user.
+        await interaction.followup.send(f"An error occurred: {e}", ephemeral=True)
 
 @bot.tree.command(name="purge", description="Purge the last x messages from current channel")
 @app.commands.describe(amount="Amount of messages to delete")
@@ -113,14 +123,13 @@ async def clear_error(interaction: discord.Interaction, error):
     if isinstance(error, app.commands.MissingPermissions):
         await interaction.response.send_message("You do not have permission to delete messages.", ephemeral=True)
 
+
+
+
 def getToken():
     token = os.environ.get("DISCORD_TOKEN")
     if token is None:
         print("ERROR: DISCORD_TOKEN environment variable not found")
     return token
 
-
-
-        
-bot.run(getToken())
-
+bot.run(getToken)    
