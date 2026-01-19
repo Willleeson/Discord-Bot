@@ -1,9 +1,9 @@
-name: Build and Deploy Container to Azure
+name: Build and Deploy Bot to Azure Container
 
 on:
   push:
     branches:
-      - feature/Microsoft-Azure-Upload  # Matches your current branch
+      - feature/Microsoft-Azure-Upload
   workflow_dispatch:
 
 jobs:
@@ -16,15 +16,13 @@ jobs:
       - name: Login to Azure
         uses: azure/login@v2
         with:
-          # Using the credentials JSON is the most reliable method for ACI/ACR
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
       - name: Log in to Azure Container Registry
         run: az acr login --name posiedon
 
-      - name: Build and Push Image to ACR
+      - name: Build and Push Image
         run: |
-          # Builds the Dockerfile in your folder and pushes it to your 'posiedon' registry
           az acr build --registry posiedon --image discord-bot:${{ github.sha }} .
 
       - name: Deploy to Azure Container Instances
