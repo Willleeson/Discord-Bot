@@ -1,10 +1,29 @@
 """Discord Bot Posiedon Main Function"""
 from maps import raidMaps
+from flask import Flask
+from threading import Thread
 import discord
 from discord.ext import commands
 from discord import app_commands as app
 import random
 import os
+
+
+
+alive = Flask('')
+
+@alive.route('/')
+def home():
+    return "Bot is Online!" 
+
+def run_flask():
+    port = int(os.environ.get("WEBSITE_PORT", 8080))
+    alive.run(host='0.0.0.0', port=port)
+
+def keep_alive():
+    t = Thread(target=run_flask)
+    t.daemon = True # Ensures the thread dies when the main script stops
+    t.start()
 
 intents = discord.Intents.default()
 intents.message_content = True
@@ -98,7 +117,6 @@ async def raid(interaction: discord.Interaction, size: app.commands.Choice[int])
             embed.add_field(name="Defending Equipment", value=mapDetails[4], inline=True)
             embed.add_field(name="\u200b", value="\u200b", inline=False)
             embed.add_field(name="Vehicles", value=mapDetails[5], inline=True)
-
             image_url = mapDetails[0]
             if image_url and image_url.startswith("http"):
                 embed.set_image(url=image_url)
@@ -122,7 +140,6 @@ async def purge(interaction: discord.Interaction, amount: int):
 async def clear_error(interaction: discord.Interaction, error):
     if isinstance(error, app.commands.MissingPermissions):
         await interaction.response.send_message("You do not have permission to delete messages.", ephemeral=True)
-
 
 
 
